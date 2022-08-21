@@ -3,13 +3,12 @@ package resources;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.restassured.RestAssured;
 import pojo.Location;
 import pojo.addPlace;
 
 public class TestDataBuild {
 	
-	public Object addPlacePayload(String name, String language, String address)
+	public Object addPlacePayload(String name,String language,String address)
 	{
 		addPlace p = new addPlace();
 		p.setAccuracy(50);

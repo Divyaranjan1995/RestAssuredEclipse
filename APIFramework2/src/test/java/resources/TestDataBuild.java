@@ -12,15 +12,15 @@ import pojo.addPlace;
 
 public class TestDataBuild {
 	
-	public Object addPlacePayload()
+	public Object addPlacePayload(String name,String language,String address)
 	{
 		addPlace p = new addPlace();
 		p.setAccuracy(50);
-		p.setName("Divyaranjan Padhiary");
+		p.setName(name);
 		p.setPhone_number("(+91) 983 893 3937");
-		p.setAddress("29, side layout, cohen 09");
+		p.setAddress(address);
 		p.setWebsite("http://google.com");
-		p.setLanguage("French-IN");
+		p.setLanguage(language);
 		
 		Location l = new Location();
 		

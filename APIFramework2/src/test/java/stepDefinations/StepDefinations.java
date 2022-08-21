@@ -8,6 +8,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
+import resources.APIresources;
 import resources.TestDataBuild;
 import resources.Utils;
 import static org.junit.Assert.*;
@@ -22,20 +23,30 @@ public class StepDefinations extends Utils{
 	RequestSpecification request;
 	Response response;
 	
+	
 	TestDataBuild data = new TestDataBuild();
 	
 	
-	@Given("Add Place Payload")
-	public void add_place_payload() throws IOException {
+	@Given("Add Place Payload with {string} {string} {string}")
+	public void add_place_payload_with(String name, String language, String address) throws IOException {
 	    // Write code here that turns the phrase above into concrete actions
-	    request = given().spec(requestSpecification()).body(data.addPlacePayload());
+	    request = given().spec(requestSpecification()).body(data.addPlacePayload(name, language, address));
 	}
-	@When("user calls {string} with Post http request")
-	public void user_calls_with_post_http_request(String string) {
+	@When("user calls {string} with {string} http request")
+	public void user_calls_with_http_request(String resource, String httpMethod) {
 	    // Write code here that turns the phrase above into concrete actions
-	    response = request
-	    		.when().post("maps/api/place/add/json")
-	    		.then().spec(responseSpecification()).extract().response();
+		// Constructor will be called with value of resource you pass
+		
+		APIresources resourceAPI = APIresources.valueOf(resource);
+		System.out.println(resourceAPI.getResource());
+		
+		if(httpMethod.equalsIgnoreCase("POST"))
+			response = request.when().post(resourceAPI.getResource());
+		else if(httpMethod.equalsIgnoreCase("GET"))
+			response = request.when().get(resourceAPI.getResource());
+	    		
+	    		
+//	    		.then().spec(responseSpecification()).extract().response();
 	}
 	@Then("the API call got success with status code {int}")
 	public void the_api_call_got_success_with_status_code(Integer sCode) {
@@ -45,12 +56,25 @@ public class StepDefinations extends Utils{
 	@Then("{string} in response body is {string}")
 	public void in_response_body_is(String key, String expectedValue) {
 	    // Write code here that turns the phrase above into concrete actions
-	    String resp = response.asString();
-		JsonPath js = new JsonPath(resp);
+//	    String resp = response.asString();
+//		JsonPath js = new JsonPath(resp);
 	    
-	    String actualValue = js.getString(key);
+	    String actualValue = getJsonPath(response, key);
 	    
 	    assertEquals(actualValue,expectedValue);
+	}
+	
+	@Then("verify place_Id created maps to {string} using {string}")
+	public void verify_place_id_created_maps_to_using(String name, String resource) throws IOException {
+	    // Write code here that turns the phrase above into concrete actions
+	    String place_id = getJsonPath(response, "place_id");
+	    
+	    request = given().spec(requestSpecification()).queryParam("place_id", place_id);
+	    user_calls_with_http_request(resource, "GET");
+	    
+	    String actualName = getJsonPath(response, "name");
+	    
+	    assertEquals(actualName,name);
 	}
 
 }
